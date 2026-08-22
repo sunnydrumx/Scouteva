@@ -7,7 +7,7 @@ Discover → Develop → Build → Launch → Grow
 
 ## Contact
 Email: Visioncatalystsgroup@gmail.com
-WhatsApp/Phone: +3349014651396
+WhatsApp/Phone: +2349014651396
 
 ## Files
 - index.html
