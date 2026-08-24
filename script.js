@@ -1,38 +1,57 @@
 /* =========================
-   SCOUTEVA MENU
+   MOBILE MENU
 ========================= */
 
-const toggle = document.querySelector('.menu-toggle');
-const nav = document.querySelector('.nav');
+const toggle = document.querySelector(".menu-toggle");
+const nav = document.querySelector(".nav");
 
 if (toggle && nav) {
-  toggle.addEventListener('click', () => {
-    const open = nav.classList.toggle('open');
+  toggle.addEventListener("click", () => {
+    const open = nav.classList.toggle("open");
 
     toggle.setAttribute(
-      'aria-expanded',
-      open ? 'true' : 'false'
+      "aria-expanded",
+      open ? "true" : "false"
     );
-  });
 
-  document.querySelectorAll('.nav a').forEach(link => {
-    link.addEventListener('click', () => {
-      nav.classList.remove('open');
+    toggle.setAttribute(
+      "aria-label",
+      open ? "Close menu" : "Open menu"
+    );
 
-      toggle.setAttribute(
-        'aria-expanded',
-        'false'
-      );
-    });
+    toggle.textContent = open ? "✕" : "☰";
   });
 }
+
+
+/* =========================
+   CLOSE MOBILE MENU
+========================= */
+
+document.querySelectorAll(".nav a").forEach((link) => {
+
+  link.addEventListener("click", () => {
+
+    if (nav) {
+      nav.classList.remove("open");
+    }
+
+    if (toggle) {
+      toggle.setAttribute("aria-expanded", "false");
+      toggle.setAttribute("aria-label", "Open menu");
+      toggle.textContent = "☰";
+    }
+
+  });
+
+});
 
 
 /* =========================
    CURRENT YEAR
 ========================= */
 
-const year = document.getElementById('year');
+const year = document.getElementById("year");
 
 if (year) {
   year.textContent = new Date().getFullYear();
@@ -48,11 +67,11 @@ function getNextWorkingDay() {
 
   const date = new Date();
 
-  // Start from tomorrow
+  // Move to the next day first
   date.setDate(date.getDate() + 1);
 
-  // 0 = Sunday
-  // 6 = Saturday
+  // Saturday = 6
+  // Sunday = 0
 
   while (
     date.getDay() === 0 ||
@@ -66,135 +85,253 @@ function getNextWorkingDay() {
 
 
 /* =========================
-   BOOKING FORM
+   FORMAT DATE
 ========================= */
 
-const bookingForm =
-  document.getElementById('bookingForm');
+function formatAppointmentDate(date) {
 
-const bookingSuccess =
-  document.getElementById('bookingSuccess');
-
-const newBooking =
-  document.getElementById('newBooking');
-
-
-if (bookingForm) {
-
-  bookingForm.addEventListener('submit', function(event) {
-
-    event.preventDefault();
-
-
-    /*
-      The consultation is automatically assigned
-      to the next working day at 12:00 PM.
-
-      The date is calculated here but is not displayed
-      as a public "appointment" on the website.
-    */
-
-    const nextWorkingDay =
-      getNextWorkingDay();
-
-    const appointmentDate =
-      nextWorkingDay.toISOString().split('T')[0];
-
-    const appointmentTime =
-      '12:00 PM';
-
-
-    /* Collect form information */
-
-    const formData = new FormData(bookingForm);
-
-    const bookingData = {
-
-      name: formData.get('clientName'),
-
-      email: formData.get('clientEmail'),
-
-      clientType: formData.get('clientType'),
-
-      project: formData.get('project'),
-
-      paymentReference:
-        formData.get('paymentReference'),
-
-      appointmentDate:
-        appointmentDate,
-
-      appointmentTime:
-        appointmentTime,
-
-      submittedAt:
-        new Date().toISOString()
-
-    };
-
-
-    /*
-      Save the booking locally.
-
-      This makes the form actually process the
-      information in the browser.
-
-      When you later connect a backend, email service
-      or Paystack, this same bookingData object can
-      be sent to it.
-    */
-
-    localStorage.setItem(
-      'scoutevaLatestBooking',
-      JSON.stringify(bookingData)
-    );
-
-
-    /* Hide form */
-
-    bookingForm.hidden = true;
-
-
-    /* Show success */
-
-    if (bookingSuccess) {
-      bookingSuccess.hidden = false;
-
-      bookingSuccess.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
+  return date.toLocaleDateString(
+    "en-NG",
+    {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
     }
-
-  });
+  );
 
 }
 
 
 /* =========================
-   NEW BOOKING
+   APPOINTMENT FORM
 ========================= */
 
-if (newBooking) {
+const appointmentForm =
+  document.getElementById("appointmentForm");
 
-  newBooking.addEventListener('click', () => {
+const paymentCard =
+  document.getElementById("paymentCard");
 
-    if (bookingForm) {
-      bookingForm.reset();
-      bookingForm.hidden = false;
+const paymentCompleteBtn =
+  document.getElementById("paymentCompleteBtn");
+
+const appointmentResult =
+  document.getElementById("appointmentResult");
+
+
+let clientInformation = null;
+
+
+if (appointmentForm) {
+
+  appointmentForm.addEventListener(
+    "submit",
+    function(event) {
+
+      event.preventDefault();
+
+      const formData =
+        new FormData(appointmentForm);
+
+      clientInformation = {
+
+        name:
+          formData.get("clientName").trim(),
+
+        email:
+          formData.get("clientEmail").trim(),
+
+        phone:
+          formData.get("clientPhone").trim(),
+
+        service:
+          formData.get("service"),
+
+        details:
+          formData.get("projectDetails").trim()
+
+      };
+
+
+      /*
+        Move the user to the payment section
+      */
+
+      if (paymentCard) {
+
+        paymentCard.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================
+   PAYMENT COMPLETED
+========================= */
+
+if (paymentCompleteBtn) {
+
+  paymentCompleteBtn.addEventListener(
+    "click",
+    function() {
+
+      /*
+        Make sure the client filled the form first.
+      */
+
+      if (!clientInformation) {
+
+        alert(
+          "Please complete the consultation form first."
+        );
+
+        const booking =
+          document.getElementById("booking");
+
+        if (booking) {
+
+          booking.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+
+        }
+
+        return;
+
+      }
+
+
+      /*
+        Automatically calculate the
+        next Monday-Friday.
+      */
+
+      const appointmentDate =
+        getNextWorkingDay();
+
+      const formattedDate =
+        formatAppointmentDate(appointmentDate);
+
+
+      /*
+        Appointment is ALWAYS 12 PM.
+      */
+
+      const appointmentTime =
+        "12:00 PM";
+
+
+      /*
+        Build WhatsApp message.
+      */
+
+      const message =
+`Hello SCOUTEVA,
+
+I have completed my payment and would like to confirm my consultation request.
+
+Name: ${clientInformation.name}
+Email: ${clientInformation.email}
+Phone/WhatsApp: ${clientInformation.phone}
+
+Service: ${clientInformation.service}
+
+Project details:
+${clientInformation.details}
+
+Requested appointment:
+${formattedDate} at ${appointmentTime}
+
+I have my payment confirmation available.
+
+Thank you.`;
+
+
+      const whatsappURL =
+        "https://wa.me/2349014651396?text=" +
+        encodeURIComponent(message);
+
+
+      /*
+        Show confirmation.
+      */
+
+      if (appointmentResult) {
+
+        appointmentResult.innerHTML = `
+          <strong>Request ready.</strong><br><br>
+          Your appointment request is for
+          <strong>${formattedDate}</strong>
+          at <strong>${appointmentTime}</strong>.<br><br>
+          Tap the button below to send your payment confirmation
+          and appointment request to SCOUTEVA on WhatsApp.
+          <br><br>
+
+          <a
+            class="btn btn-primary full-btn"
+            href="${whatsappURL}"
+            target="_blank"
+            rel="noopener"
+          >
+            Send request on WhatsApp ↗
+          </a>
+        `;
+
+        appointmentResult.classList.add("show");
+
+        appointmentResult.scrollIntoView({
+          behavior: "smooth",
+          block: "center"
+        });
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================
+   SMOOTH INTERNAL LINKS
+========================= */
+
+document.querySelectorAll(
+  'a[href^="#"]'
+).forEach((link) => {
+
+  link.addEventListener("click", function(event) {
+
+    const targetID =
+      this.getAttribute("href");
+
+    if (!targetID || targetID === "#") {
+      return;
     }
 
-    if (bookingSuccess) {
-      bookingSuccess.hidden = true;
+    const target =
+      document.querySelector(targetID);
+
+    if (!target) {
+      return;
     }
 
-    if (bookingForm) {
-      bookingForm.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }
+    event.preventDefault();
+
+    target.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
 
   });
 
-}
+});
