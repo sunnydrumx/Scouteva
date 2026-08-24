@@ -1,43 +1,36 @@
-/* =========================================
-   SCOUTEVA NAVIGATION
-========================================= */
+/* =========================
+   SCOUTEVA MENU
+========================= */
 
 const toggle = document.querySelector('.menu-toggle');
 const nav = document.querySelector('.nav');
 
 if (toggle && nav) {
-
   toggle.addEventListener('click', () => {
-
     const open = nav.classList.toggle('open');
 
-    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-
+    toggle.setAttribute(
+      'aria-expanded',
+      open ? 'true' : 'false'
+    );
   });
 
+  document.querySelectorAll('.nav a').forEach(link => {
+    link.addEventListener('click', () => {
+      nav.classList.remove('open');
+
+      toggle.setAttribute(
+        'aria-expanded',
+        'false'
+      );
+    });
+  });
 }
 
 
-document.querySelectorAll('.nav a').forEach(link => {
-
-  link.addEventListener('click', () => {
-
-    if (nav) {
-      nav.classList.remove('open');
-    }
-
-    if (toggle) {
-      toggle.setAttribute('aria-expanded', 'false');
-    }
-
-  });
-
-});
-
-
-/* =========================================
-   FOOTER YEAR
-========================================= */
+/* =========================
+   CURRENT YEAR
+========================= */
 
 const year = document.getElementById('year');
 
@@ -46,78 +39,44 @@ if (year) {
 }
 
 
-/* =========================================
+/* =========================
    NEXT WORKING DAY
    Monday - Friday
-========================================= */
+========================= */
 
 function getNextWorkingDay() {
 
   const date = new Date();
 
-  date.setHours(12, 0, 0, 0);
+  // Start from tomorrow
+  date.setDate(date.getDate() + 1);
 
-  do {
-    date.setDate(date.getDate() + 1);
-  } while (
+  // 0 = Sunday
+  // 6 = Saturday
+
+  while (
     date.getDay() === 0 ||
     date.getDay() === 6
-  );
+  ) {
+    date.setDate(date.getDate() + 1);
+  }
 
   return date;
 }
 
 
-/* =========================================
-   FORMAT DATE
-========================================= */
-
-function formatAppointmentDate(date) {
-
-  return date.toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric'
-  });
-
-}
-
-
-/* =========================================
-   DISPLAY APPOINTMENT
-========================================= */
-
-const appointmentDate =
-  document.getElementById('appointmentDate');
-
-let appointmentDay = null;
-
-if (appointmentDate) {
-
-  appointmentDay = getNextWorkingDay();
-
-  appointmentDate.textContent =
-    formatAppointmentDate(appointmentDay);
-
-}
-
-
-/* =========================================
+/* =========================
    BOOKING FORM
-========================================= */
+========================= */
 
 const bookingForm =
   document.getElementById('bookingForm');
 
-const paymentBox =
-  document.getElementById('paymentBox');
+const bookingSuccess =
+  document.getElementById('bookingSuccess');
 
-const whatsappBooking =
-  document.getElementById('whatsappBooking');
-
-const confirmationText =
-  document.getElementById('confirmationText');
+const newBooking =
+  document.getElementById('newBooking');
 
 
 if (bookingForm) {
@@ -127,121 +86,115 @@ if (bookingForm) {
     event.preventDefault();
 
 
-    const name =
-      document.getElementById('clientName').value.trim();
+    /*
+      The consultation is automatically assigned
+      to the next working day at 12:00 PM.
 
-    const email =
-      document.getElementById('clientEmail').value.trim();
+      The date is calculated here but is not displayed
+      as a public "appointment" on the website.
+    */
 
-    const phone =
-      document.getElementById('clientPhone').value.trim();
+    const nextWorkingDay =
+      getNextWorkingDay();
 
-    const service =
-      document.getElementById('service').value;
+    const appointmentDate =
+      nextWorkingDay.toISOString().split('T')[0];
 
-    const message =
-      document.getElementById('projectMessage').value.trim();
+    const appointmentTime =
+      '12:00 PM';
 
 
-    if (
-      !name ||
-      !email ||
-      !phone ||
-      !service ||
-      !message
-    ) {
-      alert('Please complete all the booking fields.');
-      return;
+    /* Collect form information */
+
+    const formData = new FormData(bookingForm);
+
+    const bookingData = {
+
+      name: formData.get('clientName'),
+
+      email: formData.get('clientEmail'),
+
+      clientType: formData.get('clientType'),
+
+      project: formData.get('project'),
+
+      paymentReference:
+        formData.get('paymentReference'),
+
+      appointmentDate:
+        appointmentDate,
+
+      appointmentTime:
+        appointmentTime,
+
+      submittedAt:
+        new Date().toISOString()
+
+    };
+
+
+    /*
+      Save the booking locally.
+
+      This makes the form actually process the
+      information in the browser.
+
+      When you later connect a backend, email service
+      or Paystack, this same bookingData object can
+      be sent to it.
+    */
+
+    localStorage.setItem(
+      'scoutevaLatestBooking',
+      JSON.stringify(bookingData)
+    );
+
+
+    /* Hide form */
+
+    bookingForm.hidden = true;
+
+
+    /* Show success */
+
+    if (bookingSuccess) {
+      bookingSuccess.hidden = false;
+
+      bookingSuccess.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
     }
-
-
-    /* Recalculate in case the page stayed open overnight */
-
-    appointmentDay = getNextWorkingDay();
-
-    const formattedDate =
-      formatAppointmentDate(appointmentDay);
-
-
-    appointmentDate.textContent =
-      formattedDate;
-
-
-    /* Confirmation information */
-
-    confirmationText.innerHTML = `
-      <strong>${name}</strong><br>
-      Service: ${service}<br>
-      Consultation: ${formattedDate} at 12:00 PM<br>
-      Email: ${email}<br>
-      Phone: ${phone}
-    `;
-
-
-    /* WhatsApp booking message */
-
-    const whatsappMessage =
-      `Hello SCOUTEVA,
-
-I would like to book a consultation.
-
-Name: ${name}
-Email: ${email}
-Phone/WhatsApp: ${phone}
-Service: ${service}
-
-Appointment date: ${formattedDate}
-Appointment time: 12:00 PM
-
-Project details:
-${message}
-
-I will make the manual payment to:
-
-Access Bank
-Account Number: 0717553338
-Account Name: Sunday Samuel
-
-I will send my payment confirmation here after payment.`;
-
-
-    const whatsappURL =
-      `https://wa.me/2349014651396?text=${encodeURIComponent(whatsappMessage)}`;
-
-
-    whatsappBooking.href = whatsappURL;
-
-
-    /* Show payment */
-
-    paymentBox.hidden = false;
-
-
-    /* Scroll payment into view */
-
-    paymentBox.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
 
   });
 
 }
 
 
-/* =========================================
-   KEEP APPOINTMENT DAY VALID
-========================================= */
+/* =========================
+   NEW BOOKING
+========================= */
 
-setInterval(() => {
+if (newBooking) {
 
-  const newDate = getNextWorkingDay();
+  newBooking.addEventListener('click', () => {
 
-  if (appointmentDate) {
+    if (bookingForm) {
+      bookingForm.reset();
+      bookingForm.hidden = false;
+    }
 
-    appointmentDate.textContent =
-      formatAppointmentDate(newDate);
+    if (bookingSuccess) {
+      bookingSuccess.hidden = true;
+    }
 
-  }
+    if (bookingForm) {
+      bookingForm.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
 
-}, 60000);
+  });
+
+}
