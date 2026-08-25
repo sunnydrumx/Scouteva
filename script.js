@@ -1,337 +1,373 @@
-/* =========================
-   MOBILE MENU
-========================= */
+document.addEventListener("DOMContentLoaded", () => {
 
-const toggle = document.querySelector(".menu-toggle");
-const nav = document.querySelector(".nav");
+  /* =========================
+     MOBILE MENU
+  ========================= */
 
-if (toggle && nav) {
-  toggle.addEventListener("click", () => {
-    const open = nav.classList.toggle("open");
+  const toggle = document.querySelector(".menu-toggle");
+  const nav = document.querySelector(".nav");
 
-    toggle.setAttribute(
-      "aria-expanded",
-      open ? "true" : "false"
-    );
+  if (toggle && nav) {
 
-    toggle.setAttribute(
-      "aria-label",
-      open ? "Close menu" : "Open menu"
-    );
+    toggle.addEventListener("click", () => {
 
-    toggle.textContent = open ? "✕" : "☰";
-  });
-}
+      const isOpen = nav.classList.toggle("open");
 
+      toggle.setAttribute(
+        "aria-expanded",
+        String(isOpen)
+      );
 
-/* =========================
-   CLOSE MOBILE MENU
-========================= */
+      toggle.setAttribute(
+        "aria-label",
+        isOpen ? "Close menu" : "Open menu"
+      );
 
-document.querySelectorAll(".nav a").forEach((link) => {
+      toggle.textContent = isOpen ? "×" : "☰";
 
-  link.addEventListener("click", () => {
+    });
 
-    if (nav) {
-      nav.classList.remove("open");
-    }
 
-    if (toggle) {
-      toggle.setAttribute("aria-expanded", "false");
-      toggle.setAttribute("aria-label", "Open menu");
-      toggle.textContent = "☰";
-    }
+    nav.querySelectorAll("a").forEach(link => {
 
-  });
+      link.addEventListener("click", () => {
 
-});
+        nav.classList.remove("open");
 
-
-/* =========================
-   CURRENT YEAR
-========================= */
-
-const year = document.getElementById("year");
-
-if (year) {
-  year.textContent = new Date().getFullYear();
-}
-
-
-/* =========================
-   NEXT WORKING DAY
-   Monday - Friday
-========================= */
-
-function getNextWorkingDay() {
-
-  const date = new Date();
-
-  // Move to the next day first
-  date.setDate(date.getDate() + 1);
-
-  // Saturday = 6
-  // Sunday = 0
-
-  while (
-    date.getDay() === 0 ||
-    date.getDay() === 6
-  ) {
-    date.setDate(date.getDate() + 1);
-  }
-
-  return date;
-}
-
-
-/* =========================
-   FORMAT DATE
-========================= */
-
-function formatAppointmentDate(date) {
-
-  return date.toLocaleDateString(
-    "en-NG",
-    {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric"
-    }
-  );
-
-}
-
-
-/* =========================
-   APPOINTMENT FORM
-========================= */
-
-const appointmentForm =
-  document.getElementById("appointmentForm");
-
-const paymentCard =
-  document.getElementById("paymentCard");
-
-const paymentCompleteBtn =
-  document.getElementById("paymentCompleteBtn");
-
-const appointmentResult =
-  document.getElementById("appointmentResult");
-
-
-let clientInformation = null;
-
-
-if (appointmentForm) {
-
-  appointmentForm.addEventListener(
-    "submit",
-    function(event) {
-
-      event.preventDefault();
-
-      const formData =
-        new FormData(appointmentForm);
-
-      clientInformation = {
-
-        name:
-          formData.get("clientName").trim(),
-
-        email:
-          formData.get("clientEmail").trim(),
-
-        phone:
-          formData.get("clientPhone").trim(),
-
-        service:
-          formData.get("service"),
-
-        details:
-          formData.get("projectDetails").trim()
-
-      };
-
-
-      /*
-        Move the user to the payment section
-      */
-
-      if (paymentCard) {
-
-        paymentCard.scrollIntoView({
-          behavior: "smooth",
-          block: "center"
-        });
-
-      }
-
-    }
-  );
-
-}
-
-
-/* =========================
-   PAYMENT COMPLETED
-========================= */
-
-if (paymentCompleteBtn) {
-
-  paymentCompleteBtn.addEventListener(
-    "click",
-    function() {
-
-      /*
-        Make sure the client filled the form first.
-      */
-
-      if (!clientInformation) {
-
-        alert(
-          "Please complete the consultation form first."
+        toggle.setAttribute(
+          "aria-expanded",
+          "false"
         );
 
-        const booking =
-          document.getElementById("booking");
+        toggle.setAttribute(
+          "aria-label",
+          "Open menu"
+        );
 
-        if (booking) {
+        toggle.textContent = "☰";
 
-          booking.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-          });
+      });
+
+    });
+
+  }
+
+
+  /* =========================
+     COPYRIGHT YEAR
+  ========================= */
+
+  const year = document.getElementById("year");
+
+  if (year) {
+    year.textContent = new Date().getFullYear();
+  }
+
+
+  /* =========================
+     APPOINTMENT DATE
+     NEXT WORKING DAY
+     12:00 PM AUTOMATICALLY
+  ========================= */
+
+  function getNextWorkingDay() {
+
+    const date = new Date();
+
+    date.setHours(12, 0, 0, 0);
+
+    do {
+      date.setDate(date.getDate() + 1);
+    } while (
+      date.getDay() === 0 ||
+      date.getDay() === 6
+    );
+
+    return date;
+  }
+
+
+  function formatAppointmentDate(date) {
+
+    return date.toLocaleDateString(
+      "en-NG",
+      {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+      }
+    );
+
+  }
+
+
+  const appointmentDate =
+    document.getElementById("appointmentDate");
+
+  const appointment =
+    getNextWorkingDay();
+
+  if (appointmentDate) {
+
+    appointmentDate.textContent =
+      formatAppointmentDate(appointment);
+
+  }
+
+
+  /* =========================
+     PAYMENT REFERENCE
+  ========================= */
+
+  function createPaymentReference() {
+
+    const now = new Date();
+
+    const datePart =
+      now.getFullYear().toString() +
+      String(now.getMonth() + 1).padStart(2, "0") +
+      String(now.getDate()).padStart(2, "0");
+
+    const randomPart =
+      Math.random()
+        .toString(36)
+        .substring(2, 7)
+        .toUpperCase();
+
+    return `SCOUTEVA-${datePart}-${randomPart}`;
+
+  }
+
+
+  const paymentReference =
+    document.getElementById("paymentReference");
+
+  const generatedReference =
+    createPaymentReference();
+
+  if (paymentReference) {
+    paymentReference.textContent =
+      generatedReference;
+  }
+
+
+  /* =========================
+     START REQUEST BUTTON
+  ========================= */
+
+  const openRequest =
+    document.getElementById("openRequest");
+
+  const requestSection =
+    document.getElementById("request");
+
+  if (openRequest && requestSection) {
+
+    openRequest.addEventListener("click", () => {
+
+      requestSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+
+      setTimeout(() => {
+
+        const nameInput =
+          document.getElementById("clientName");
+
+        if (nameInput) {
+          nameInput.focus();
+        }
+
+      }, 700);
+
+    });
+
+  }
+
+
+  /* =========================
+     REQUEST FORM
+  ========================= */
+
+  const requestForm =
+    document.getElementById("requestForm");
+
+  const confirmation =
+    document.getElementById("confirmation");
+
+  const confirmationText =
+    document.getElementById("confirmationText");
+
+  const confirmationWhatsApp =
+    document.getElementById("confirmationWhatsApp");
+
+
+  if (requestForm) {
+
+    requestForm.addEventListener(
+      "submit",
+      event => {
+
+        event.preventDefault();
+
+
+        /* Get form values */
+
+        const name =
+          document
+            .getElementById("clientName")
+            .value
+            .trim();
+
+        const email =
+          document
+            .getElementById("clientEmail")
+            .value
+            .trim();
+
+        const phone =
+          document
+            .getElementById("clientPhone")
+            .value
+            .trim();
+
+        const service =
+          document
+            .getElementById("service")
+            .value
+            .trim();
+
+        const message =
+          document
+            .getElementById("projectMessage")
+            .value
+            .trim();
+
+
+        if (
+          !name ||
+          !email ||
+          !phone ||
+          !service ||
+          !message
+        ) {
+
+          alert(
+            "Please complete all required fields before submitting."
+          );
+
+          return;
 
         }
 
-        return;
+
+        /* Appointment */
+
+        const appointmentText =
+          formatAppointmentDate(appointment);
+
+
+        /* Confirmation */
+
+        if (confirmationText) {
+
+          confirmationText.textContent =
+            `Thank you, ${name}. Your request has been received. ` +
+            `Your appointment is scheduled for ` +
+            `${appointmentText} at 12:00 PM. ` +
+            `Your payment reference is ${generatedReference}.`;
+
+        }
+
+
+        /* WhatsApp message */
+
+        const whatsappMessage =
+          `Hello SCOUTEVA, I have submitted a project request.\n\n` +
+          `Name: ${name}\n` +
+          `Email: ${email}\n` +
+          `Phone/WhatsApp: ${phone}\n` +
+          `Service: ${service}\n` +
+          `Project: ${message}\n\n` +
+          `Appointment: ${appointmentText} at 12:00 PM\n` +
+          `Payment Reference: ${generatedReference}`;
+
+
+        if (confirmationWhatsApp) {
+
+          confirmationWhatsApp.href =
+            `https://wa.me/2349014651396?text=` +
+            encodeURIComponent(whatsappMessage);
+
+        }
+
+
+        /* Hide form */
+
+        requestForm.hidden = true;
+
+
+        /* Show confirmation */
+
+        if (confirmation) {
+          confirmation.hidden = false;
+
+          confirmation.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+          });
+        }
 
       }
+    );
+
+  }
 
 
-      /*
-        Automatically calculate the
-        next Monday-Friday.
-      */
+  /* =========================
+     SERVICE CARDS
+     They are informational,
+     so no fake links/actions.
+  ========================= */
 
-      const appointmentDate =
-        getNextWorkingDay();
+  /* =========================
+     SMOOTH INTERNAL LINKS
+     ========================= */
 
-      const formattedDate =
-        formatAppointmentDate(appointmentDate);
+  document
+    .querySelectorAll('a[href^="#"]')
+    .forEach(link => {
 
+      link.addEventListener("click", event => {
 
-      /*
-        Appointment is ALWAYS 12 PM.
-      */
+        const targetId =
+          link.getAttribute("href");
 
-      const appointmentTime =
-        "12:00 PM";
+        if (
+          !targetId ||
+          targetId === "#"
+        ) {
+          return;
+        }
 
+        const target =
+          document.querySelector(targetId);
 
-      /*
-        Build WhatsApp message.
-      */
+        if (!target) {
+          return;
+        }
 
-      const message =
-`Hello SCOUTEVA,
+        event.preventDefault();
 
-I have completed my payment and would like to confirm my consultation request.
-
-Name: ${clientInformation.name}
-Email: ${clientInformation.email}
-Phone/WhatsApp: ${clientInformation.phone}
-
-Service: ${clientInformation.service}
-
-Project details:
-${clientInformation.details}
-
-Requested appointment:
-${formattedDate} at ${appointmentTime}
-
-I have my payment confirmation available.
-
-Thank you.`;
-
-
-      const whatsappURL =
-        "https://wa.me/2349014651396?text=" +
-        encodeURIComponent(message);
-
-
-      /*
-        Show confirmation.
-      */
-
-      if (appointmentResult) {
-
-        appointmentResult.innerHTML = `
-          <strong>Request ready.</strong><br><br>
-          Your appointment request is for
-          <strong>${formattedDate}</strong>
-          at <strong>${appointmentTime}</strong>.<br><br>
-          Tap the button below to send your payment confirmation
-          and appointment request to SCOUTEVA on WhatsApp.
-          <br><br>
-
-          <a
-            class="btn btn-primary full-btn"
-            href="${whatsappURL}"
-            target="_blank"
-            rel="noopener"
-          >
-            Send request on WhatsApp ↗
-          </a>
-        `;
-
-        appointmentResult.classList.add("show");
-
-        appointmentResult.scrollIntoView({
+        target.scrollIntoView({
           behavior: "smooth",
-          block: "center"
+          block: "start"
         });
 
-      }
+      });
 
-    }
-  );
-
-}
-
-
-/* =========================
-   SMOOTH INTERNAL LINKS
-========================= */
-
-document.querySelectorAll(
-  'a[href^="#"]'
-).forEach((link) => {
-
-  link.addEventListener("click", function(event) {
-
-    const targetID =
-      this.getAttribute("href");
-
-    if (!targetID || targetID === "#") {
-      return;
-    }
-
-    const target =
-      document.querySelector(targetID);
-
-    if (!target) {
-      return;
-    }
-
-    event.preventDefault();
-
-    target.scrollIntoView({
-      behavior: "smooth",
-      block: "start"
     });
-
-  });
 
 });
