@@ -639,4 +639,266 @@
           </p>
 
           <h2>
-            Tell us what
+            Tell us what you
+            <span>want to build.</span>
+          </h2>
+
+          <p>
+            Submit your details and we'll prepare your next step.
+            Appointments are automatically scheduled for 12:00 PM
+            on the next available working day.
+          </p>
+
+        </div>
+
+
+        <form id="requestForm" class="request-form">
+
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label for="clientName">Your name</label>
+              <input
+                id="clientName"
+                name="clientName"
+                type="text"
+                placeholder="Enter your name"
+                required>
+            </div>
+
+            <div class="form-group">
+              <label for="clientEmail">Email</label>
+              <input
+                id="clientEmail"
+                name="clientEmail"
+                type="email"
+                placeholder="you@example.com"
+                required>
+            </div>
+
+            <div class="form-group">
+              <label for="clientPhone">WhatsApp / phone</label>
+              <input
+                id="clientPhone"
+                name="clientPhone"
+                type="tel"
+                placeholder="Your phone number"
+                required>
+            </div>
+
+            <div class="form-group">
+              <label for="service">What do you need?</label>
+
+              <select id="service" name="service" required>
+                <option value="">Select a service</option>
+                <option>Digital Products</option>
+                <option>Business Solutions</option>
+                <option>Strategy & Ideas</option>
+                <option>Innovation & Growth</option>
+                <option>Other</option>
+              </select>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-group">
+
+            <label for="projectMessage">
+              Tell us about your project
+            </label>
+
+            <textarea
+              id="projectMessage"
+              name="projectMessage"
+              rows="6"
+              placeholder="Briefly describe your idea, problem or project..."
+              required></textarea>
+
+          </div>
+
+
+          <!-- AUTOMATIC APPOINTMENT -->
+          <div class="appointment-box">
+
+            <div>
+              <span class="appointment-label">
+                APPOINTMENT
+              </span>
+
+              <strong id="appointmentDate">
+                Calculating next working day...
+              </strong>
+
+              <small>
+                Time: 12:00 PM
+              </small>
+            </div>
+
+            <span class="appointment-status">
+              Automatically scheduled
+            </span>
+
+          </div>
+
+
+          <!-- PAYMENT -->
+          <div class="payment-box">
+
+            <div class="payment-header">
+              <span class="payment-label">
+                MANUAL PAYMENT
+              </span>
+
+              <h3>
+                Payment instructions
+              </h3>
+
+              <p>
+                For now, payment is made manually. Pay the required amount
+                using the account details below and keep your payment receipt.
+              </p>
+            </div>
+
+
+            <div class="bank-details">
+
+              <div>
+                <span>Bank</span>
+                <strong>Access Bank</strong>
+              </div>
+
+              <div>
+                <span>Account name</span>
+                <strong>Sunday Samuel</strong>
+              </div>
+
+              <div>
+                <span>Account number</span>
+                <strong>0717553338</strong>
+              </div>
+
+            </div>
+
+
+            <div class="reference-box">
+
+              <span>
+                Your payment reference
+              </span>
+
+              <strong id="paymentReference">
+                SCOUTEVA-REQUEST
+              </strong>
+
+            </div>
+
+
+            <div class="payment-note">
+              <strong>Important:</strong>
+              After payment, keep your receipt/reference available
+              for confirmation.
+            </div>
+
+          </div>
+
+
+          <button
+            type="submit"
+            class="btn btn-submit">
+            Submit request
+            <span>↗</span>
+          </button>
+
+          <p class="form-note">
+            By submitting, you confirm that the information provided is correct.
+          </p>
+
+        </form>
+
+
+        <!-- CONFIRMATION -->
+        <div
+          class="confirmation"
+          id="confirmation"
+          hidden>
+
+          <div class="confirmation-icon">
+            ✓
+          </div>
+
+          <p class="section-kicker">
+            REQUEST RECEIVED
+          </p>
+
+          <h2>
+            You're on the way to
+            <span>progress.</span>
+          </h2>
+
+          <p id="confirmationText">
+            Your request has been received.
+          </p>
+
+          <a
+            class="btn btn-primary"
+            id="confirmationWhatsApp"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer">
+            Continue on WhatsApp ↗
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- FOOTER -->
+  <footer class="footer">
+
+    <div class="footer-brand">
+
+      <span class="brand-mark">
+        S
+      </span>
+
+      <div>
+        <strong>SCOUTEVA</strong>
+
+        <small>
+          From possibility to progress.
+        </small>
+      </div>
+
+    </div>
+
+
+    <div class="footer-links">
+
+      <a href="#services">Services</a>
+      <a href="#approach">Approach</a>
+      <a href="#audience">Who we serve</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+
+    </div>
+
+
+    <p>
+      © <span id="year"></span> SCOUTEVA.
+      All rights reserved.
+    </p>
+
+  </footer>
+
+
+  <script src="script.js"></script>
+
+</body>
+</html>
