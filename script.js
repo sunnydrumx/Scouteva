@@ -23,84 +23,105 @@
   const year = document.getElementById("year");
   if (year) year.textContent = new Date().getFullYear();
 
-  // Returns the next working day, Monday-Friday.
   function nextWorkingDay(fromDate = new Date()) {
     const date = new Date(fromDate);
     date.setHours(12, 0, 0, 0);
     date.setDate(date.getDate() + 1);
-
-    while (date.getDay() === 0 || date.getDay() === 6) {
-      date.setDate(date.getDate() + 1);
-    }
+    while (date.getDay() === 0 || date.getDay() === 6) date.setDate(date.getDate() + 1);
     return date;
   }
 
   function formatDate(date) {
     return new Intl.DateTimeFormat("en-NG", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric"
+      weekday: "long", day: "numeric", month: "long", year: "numeric"
     }).format(date);
+  }
+
+  function escapeHtml(value) {
+    return value.replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+    }[char]));
   }
 
   const bookingForm = document.getElementById("booking-form");
   const paymentSection = document.getElementById("payment");
   const bookingSummary = document.getElementById("booking-summary");
-  const paymentWhatsApp = document.getElementById("payment-whatsapp");
+  const paymentReference = document.getElementById("payment-reference");
+  const submitPayment = document.getElementById("submit-payment");
   const backToBooking = document.getElementById("back-to-booking");
+  const confirmation = document.getElementById("appointment-confirmation");
+  const confirmationMessage = document.getElementById("confirmation-message");
+  const confirmedDate = document.getElementById("confirmed-date");
+  const confirmationWhatsApp = document.getElementById("confirmation-whatsapp");
+
+  let booking = null;
 
   if (bookingForm && paymentSection) {
     bookingForm.addEventListener("submit", (event) => {
       event.preventDefault();
-
       if (!bookingForm.checkValidity()) {
         bookingForm.reportValidity();
         return;
       }
 
-      const formData = new FormData(bookingForm);
-      const name = String(formData.get("name") || "").trim();
-      const email = String(formData.get("email") || "").trim();
-      const service = String(formData.get("service") || "").trim();
-      const message = String(formData.get("message") || "").trim();
+      const data = new FormData(bookingForm);
+      booking = {
+        name: String(data.get("name") || "").trim(),
+        email: String(data.get("email") || "").trim(),
+        phone: String(data.get("phone") || "").trim(),
+        service: String(data.get("service") || "").trim(),
+        message: String(data.get("message") || "").trim(),
+        appointmentDate: nextWorkingDay()
+      };
 
-      const appointmentDate = nextWorkingDay();
-
+      // Do not reveal the appointment date/time before payment confirmation.
       bookingSummary.innerHTML =
-        `<strong>${escapeHtml(name)}</strong>, your requested consultation slot is ` +
-        `<strong>12:00 PM on ${escapeHtml(formatDate(appointmentDate))}</strong>. ` +
-        `Complete the manual payment below, then send the payment confirmation on WhatsApp.`;
+        `<strong>${escapeHtml(booking.name)}</strong>, your request is ready for payment. ` +
+        `Complete the payment using the account details below, then enter your payment reference to confirm your appointment.`;
 
-      const whatsappText =
-        `Hello SCOUTEVA, I have completed my manual payment for my consultation.%0A%0A` +
-        `Name: ${encodeURIComponent(name)}%0A` +
-        `Email: ${encodeURIComponent(email)}%0A` +
-        `Service: ${encodeURIComponent(service)}%0A` +
-        `Appointment: 12:00 PM, ${encodeURIComponent(formatDate(appointmentDate))}%0A` +
-        `Project: ${encodeURIComponent(message)}`;
-
-      paymentWhatsApp.href = `https://wa.me/2349014651396?text=${whatsappText}`;
-
+      paymentReference.value = "";
+      confirmation.hidden = true;
       paymentSection.hidden = false;
       paymentSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  if (submitPayment) {
+    submitPayment.addEventListener("click", () => {
+      if (!booking) return;
+      const reference = paymentReference.value.trim();
+      if (!reference) {
+        paymentReference.focus();
+        paymentReference.setCustomValidity("Please enter your payment reference.");
+        paymentReference.reportValidity();
+        return;
+      }
+      paymentReference.setCustomValidity("");
+
+      confirmedDate.textContent = formatDate(booking.appointmentDate);
+      confirmationMessage.innerHTML =
+        `Thank you, <strong>${escapeHtml(booking.name)}</strong>. Your payment confirmation has been submitted. ` +
+        `Your appointment is scheduled for the date and time shown below.`;
+
+      const whatsappText =
+        `Hello SCOUTEVA, I have completed my payment and submitted my appointment confirmation.%0A%0A` +
+        `Name: ${encodeURIComponent(booking.name)}%0A` +
+        `Email: ${encodeURIComponent(booking.email)}%0A` +
+        `WhatsApp/Phone: ${encodeURIComponent(booking.phone)}%0A` +
+        `Service: ${encodeURIComponent(booking.service)}%0A` +
+        `Payment reference: ${encodeURIComponent(reference)}%0A` +
+        `Appointment: 12:00 PM, ${encodeURIComponent(formatDate(booking.appointmentDate))}`;
+
+      confirmationWhatsApp.href = `https://wa.me/2349014651396?text=${whatsappText}`;
+      confirmation.hidden = false;
+      confirmation.scrollIntoView({ behavior: "smooth", block: "center" });
     });
   }
 
   if (backToBooking && paymentSection && bookingForm) {
     backToBooking.addEventListener("click", () => {
       paymentSection.hidden = true;
-      document.getElementById("booking").scrollIntoView({ behavior: "smooth", block: "start" });
+      bookingForm.scrollIntoView({ behavior: "smooth", block: "start" });
     });
-  }
-
-  function escapeHtml(value) {
-    return value.replace(/[&<>"']/g, (char) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;"
-    }[char]));
   }
 })();

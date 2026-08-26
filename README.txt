@@ -1,21 +1,29 @@
 SCOUTEVA WEBSITE
 ================
 
-Files:
+Files included:
 - index.html
 - style.css
 - script.js
+- README.txt
 
-Put all three files in the same folder before uploading to GitHub Pages.
+Upload all files together to the same GitHub Pages repository/folder.
 
-Current booking flow:
-1. Visitor completes the booking form.
-2. The site calculates the next Monday-Friday working day automatically.
-3. Appointment time is fixed at 12:00 PM.
-4. Manual Access Bank payment instructions appear.
-5. Visitor can send payment confirmation through WhatsApp.
+CURRENT PROJECT-REQUEST FLOW
+1. Visitor fills in name, email, WhatsApp/phone, service and project description.
+2. Visitor clicks “Proceed to payment”.
+3. The payment page opens with the visitor’s request details carried forward.
+4. Appointment scheduling information is NOT shown before payment.
+5. Visitor makes the manual payment to the Access Bank details shown on the page.
+6. Visitor enters the payment reference and clicks “Submit payment confirmation”.
+7. Only after that confirmation step, the site displays the actual appointment date and 12:00 PM.
 
-Paystack is NOT connected yet, as requested. It can be added later.
+PAYMENT DETAILS
+Bank: Access Bank
+Account name: Sunday Samuel
+Account number: 07175533338
 
-Note:
-The booking form currently runs entirely in the browser. It does not create a server-side appointment record or send the form data to a database/email automatically. The WhatsApp confirmation link is the working handoff until a backend or payment/booking service is connected.
+IMPORTANT
+This is a front-end-only implementation. It does not independently verify that money was received. The payment-reference submission is a confirmation handoff and should be connected to a real payment provider/backend before treating it as automatic payment verification.
+
+Paystack is not connected yet.

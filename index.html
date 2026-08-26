@@ -165,10 +165,10 @@
         <div class="booking-copy">
           <p class="eyebrow">BOOK A CONSULTATION</p>
           <h2>Let's find the next useful step.</h2>
-          <p>Complete the short form. Your consultation is automatically scheduled for <strong>12:00 PM on the next working day</strong>. Working days are Monday to Friday.</p>
+          <p>Complete the short form to continue. Your appointment details will be provided after payment confirmation.</p>
           <div class="booking-note">
-            <strong>Manual payment for now</strong>
-            <p>After submitting your booking, follow the payment instructions shown on screen. Paystack can be connected later.</p>
+            <strong>Secure your request</strong>
+            <p>After you complete this form, you will be taken to the payment instructions page. Your appointment date and time are shown only after payment confirmation.</p>
           </div>
         </div>
 
@@ -177,6 +177,9 @@
             <label>Full name<input type="text" name="name" required autocomplete="name" placeholder="Your full name"></label>
             <label>Email<input type="email" name="email" required autocomplete="email" placeholder="you@example.com"></label>
           </div>
+          <label>WhatsApp / phone
+            <input type="tel" name="phone" required autocomplete="tel" placeholder="Your phone number">
+          </label>
           <label>What do you need help with?
             <select name="service" required>
               <option value="">Select a service</option>
@@ -190,8 +193,8 @@
           <label>Briefly tell us what you want to discuss
             <textarea name="message" rows="5" required placeholder="Tell us about the idea, challenge or opportunity..."></textarea>
           </label>
-          <button class="btn btn-primary form-submit" type="submit">Continue to payment instructions ↗</button>
-          <p class="form-small">Your appointment time is fixed at 12:00 PM. Weekend dates are automatically skipped.</p>
+          <button class="btn btn-primary form-submit" type="submit">Proceed to payment ↗</button>
+          <p class="form-small">Your appointment date and time will be shown after payment confirmation.</p>
         </form>
       </div>
     </section>
@@ -204,14 +207,29 @@
         <div class="bank-details">
           <div><span>Bank</span><strong>Access Bank</strong></div>
           <div><span>Account name</span><strong>Sunday Samuel</strong></div>
-          <div><span>Account number</span><strong>0717553338</strong></div>
+          <div><span>Account number</span><strong>07175533338</strong></div>
         </div>
-        <p class="international-note">International clients can contact SCOUTEVA through WhatsApp after booking for the appropriate international payment arrangement.</p>
+        <p class="international-note">International clients can contact SCOUTEVA through WhatsApp for the appropriate international payment arrangement.</p>
+        <label class="payment-reference-label">Payment reference
+          <input type="text" id="payment-reference" name="payment-reference" placeholder="Enter your payment reference" autocomplete="off">
+        </label>
         <div class="payment-actions">
-          <a class="btn btn-primary" id="payment-whatsapp" href="#" target="_blank" rel="noopener">Send payment confirmation on WhatsApp ↗</a>
+          <button class="btn btn-primary" id="submit-payment" type="button">Submit payment confirmation ↗</button>
           <button class="btn btn-outline" id="back-to-booking" type="button">Back to booking</button>
         </div>
-        <p class="form-small">Please make your payment only through the details displayed above and keep your payment receipt.</p>
+        <p class="form-small">After making payment, enter the reference from your receipt and submit the confirmation. Keep your receipt available.</p>
+
+        <div class="appointment-confirmation" id="appointment-confirmation" hidden aria-live="polite">
+          <p class="eyebrow">APPOINTMENT CONFIRMED</p>
+          <h3>Your appointment is confirmed.</h3>
+          <p id="confirmation-message"></p>
+          <div class="confirmed-slot">
+            <span>Appointment</span>
+            <strong id="confirmed-date"></strong>
+            <strong id="confirmed-time">12:00 PM</strong>
+          </div>
+          <a class="btn btn-primary" id="confirmation-whatsapp" href="#" target="_blank" rel="noopener">Send confirmation on WhatsApp ↗</a>
+        </div>
       </div>
     </section>
 
